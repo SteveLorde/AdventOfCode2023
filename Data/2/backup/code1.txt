@@ -4,7 +4,6 @@ using main;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
-using main.Model;
 
 
 namespace main
@@ -23,46 +22,54 @@ namespace main
             int gameId = int.Parse(lineparts[0].Trim().Split(' ')[1]);
             string subgamesString = lineparts[1].Trim();
 
-            SubGame subgames = ParseSubgames(subgamesString);
-            
+            List<SubGame> subgames = ParseSubgames(subgamesString);
+                        
             //2-create new game object based on line
             Game game = new Game();
             game.Id = gameId;
-            game.subgame = subgames;
+            game.subgames = subgames;
 
             //3-return game
             return game;
         }
 
-        static SubGame ParseSubgames(string subgamesString)
+        static List<SubGame> ParseSubgames(string subgamesString)
         {
-            SubGame subgame = new SubGame();
-            List<Color> allcolors = new List<Color>();
+            List<SubGame> subgames = new List<SubGame>();
             string[] subgameStrings = subgamesString.Split(';');
 
             foreach (var subgameString in subgameStrings)
             {
-                Color color = ParseSubgame(subgameString);
-                allcolors.Add(color);
+                SubGame subgame = ParseSubgame(subgameString);
+                subgames.Add(subgame);
             }
 
-            subgame.colorcount = allcolors;
-
-            return subgame;
+            return subgames;
         }
 
-        static Color ParseSubgame(string subgameString)
+        static SubGame ParseSubgame(string subgameString)
         {
-            Color newcolorcount = new Color();
+            SubGame newsubgame = new SubGame();
             string[] parts = subgameString.Split(',');
             
             for (int i = 0; i < parts.Length; i++)
             {
                 string[] colorCountParts = parts[i].Trim().Split(' ');
-                newcolorcount.color = colorCountParts[1];
-                newcolorcount.count = int.Parse(colorCountParts[0]);
+
+                if (colorCountParts[1] == "red")
+                {
+                    newsubgame.Red = int.Parse(colorCountParts[0]);
+                }
+                else if (colorCountParts[1] == "blue")
+                {
+                    newsubgame.Blue = int.Parse(colorCountParts[0]);
+                }
+                else if (colorCountParts[1] == "green")
+                {
+                    newsubgame.Green = int.Parse(colorCountParts[0]);
+                }
             }
-            return newcolorcount;
+            return newsubgame;
         }
 
         static void CheckDataReading(List<Game> Games)
@@ -74,7 +81,7 @@ namespace main
                 Console.WriteLine(" ");
                 Console.WriteLine("Game: " + Games[i].Id + " SubGames: ");
                 for (int subgamescount = 0; subgamescount < Games[i].subgames.Count; subgamescount++)
-                    Console.Write(Games[i].subgames[subgamescount].count + " " + Games[i].subgames[subgamescount].color + " , " );
+                    Console.Write("Red = " + Games[i].subgames[subgamescount].Red + " " + "Blue = " + Games[i].subgames[subgamescount].Blue + " " + " Green = " + Games[i].subgames[subgamescount].Green + " , " );
             }
             Console.WriteLine("");
             Console.WriteLine("Done Parsing and Reading Data Data");
